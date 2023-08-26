@@ -9,23 +9,26 @@ const app = express()
 
 app.use(express.json())
 
-app.get("/notes", (req, res) => {
-    const notes = Note.find({})
+app.get("/notes", async (req, res) => {
+    try {
+        const notes = await Note.find({})
+        res.send(notes)
+    } catch {
+        res.status(500).send(err)
+    }
 })
 
 
-app.post("/notes", (req, res) => {
-    const note = new Note(req.body)
+app.post("/notes", async (req, res) => {
+    const note = await new Note(req.body)
 
-    note.save()
-    .then(() => {
-        res.status(200).send(note)
-        console.log(note)
-    })
-    .catch((err) => {
-        res.status(500).send(err)
-        console.log(err)
-    })
+    try {
+        await note.save()
+        res.status(201).send(note)
+    }
+    catch (err) {
+        res.status(400).send(err)
+    }
 })
 
 app.listen(3000, () => {
